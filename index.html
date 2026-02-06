@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Valentine 💘</title>
 
-<!-- Confetti library -->
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
 <style>
@@ -21,34 +21,37 @@
 
   .card {
     background: white;
-    padding: 30px;
+    padding: 25px;
     border-radius: 20px;
     text-align: center;
     box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-    z-index: 5;
     position: relative;
+    z-index: 5;
+    max-width: 90%;
   }
 
   img {
-    width: 200px;
-    border-radius: 15px;
-    margin-bottom: 15px;
+    width: 220px;
+    border-radius: 20px;
+    box-shadow: 0 8px 20px rgba(255, 77, 136, 0.4);
+    margin-bottom: 10px;
   }
 
   h1 {
     color: #ff4d88;
+    margin-bottom: 5px;
   }
 
   #countdown {
-    font-size: 18px;
-    margin-bottom: 15px;
     color: #ff6f9f;
+    margin-bottom: 15px;
+    font-size: 18px;
   }
 
   .buttons {
-    display: flex;
-    gap: 20px;
-    justify-content: center;
+    position: relative;
+    height: 70px;
+    margin-top: 10px;
   }
 
   button {
@@ -58,29 +61,35 @@
     border-radius: 12px;
     cursor: pointer;
     transition: transform 0.2s ease;
+    position: absolute;
   }
 
   #yesBtn {
     background: #ff4d88;
     color: white;
-  }
-  img {
-    width: 220px;
-    border-radius: 20px;
-    box-shadow: 0 8px 20px rgba(255, 77, 136, 0.4);
+    left: 50%;
+    transform: translateX(-120%);
   }
 
   #noBtn {
     background: #ccc;
-    position: absolute;
+    color: #333;
+    left: 50%;
+    transform: translateX(20%);
   }
 
-  /* HEARTS */
+  #musicBtn {
+    margin-top: 15px;
+    background: #ffe3ef;
+    font-size: 14px;
+    position: static;
+  }
+
+  /* Floating hearts */
   .heart {
     position: absolute;
-    animation: floatUp linear infinite;
-    opacity: 0.8;
     pointer-events: none;
+    animation: floatUp linear infinite;
   }
 
   @keyframes floatUp {
@@ -93,39 +102,61 @@
 
 <body>
 
-<audio autoplay loop>
-  <source src="https://www.bensound.com/bensound-music/bensound-love.mp3" type="audio/mpeg">
+<audio id="music" loop>
+  <source src="https://cdn.pixabay.com/audio/2022/03/15/audio_9c1c7b8b2f.mp3" type="audio/mpeg">
 </audio>
 
-<div class="card" id="card">
-  <img src="us.jpeg" />
+<div class="card">
+  <img src="us.jpeg" alt="Us together ❤️">
+
   <h1>Shreya, will you be my Valentine? 💕</h1>
   <div id="countdown"></div>
 
   <div class="buttons">
     <button id="yesBtn" onclick="yesClicked()">Yes 💖</button>
-    <button id="noBtn" onmouseover="moveNo()" onclick="noClicked()">No 🙈</button>
+    <button
+      id="noBtn"
+      ontouchstart="moveNo()"
+      onmouseover="moveNo()"
+      onclick="noClicked()"
+    >
+      No 🙈
+    </button>
   </div>
+
+  <button id="musicBtn" onclick="playMusic()">Play music 🎵</button>
 </div>
 
 <script>
 let yesScale = 1;
 const noBtn = document.getElementById("noBtn");
+const yesBtn = document.getElementById("yesBtn");
+const music = document.getElementById("music");
+
+function playMusic() {
+  music.play();
+}
 
 function moveNo() {
-  noBtn.style.left = Math.random() * 70 + "%";
-  noBtn.style.top = Math.random() * 70 + "%";
+  const maxX = window.innerWidth - noBtn.offsetWidth;
+  const maxY = window.innerHeight - noBtn.offsetHeight;
+
+  const x = Math.random() * maxX;
+  const y = Math.random() * maxY;
+
+  noBtn.style.left = x + "px";
+  noBtn.style.top = y + "px";
 }
 
 function noClicked() {
-  yesScale += 0.3;
-  document.getElementById("yesBtn").style.transform = `scale(${yesScale})`;
+  yesScale += 0.35;
+  yesBtn.style.transform = `translateX(-120%) scale(${yesScale})`;
   moveNo();
 }
 
 function yesClicked() {
   confetti({
-    particleCount: 250,
+    particleCount: 300,
     spread: 120,
     origin: { y: 0.6 }
   });
@@ -138,19 +169,18 @@ function yesClicked() {
       justify-content:center;
       align-items:center;
       background:linear-gradient(135deg,#ffd6e8,#fff0f5);
-      text-align:center;
       font-family:'Comic Sans MS', cursive;
+      text-align:center;
     ">
       <h1 style="color:#ff4d88;">YAYYY SHREYA 💘🥰</h1>
       <p style="font-size:22px; max-width:300px;">
-        You just made me the happiest Valentine ever 💕
+        You just made me the happiest Valentine 💕
       </p>
-      <img src="https://i.imgur.com/9bK0G5k.png" style="width:220px;border-radius:20px;">
     </div>
   `;
 }
 
-// Floating hearts
+// Floating hearts generator
 function createHeart() {
   const heart = document.createElement("div");
   heart.className = "heart";
@@ -163,9 +193,10 @@ function createHeart() {
 }
 setInterval(createHeart, 350);
 
-// Countdown to Valentine’s Day
+// Countdown
 function updateCountdown() {
-  const valentine = new Date(new Date().getFullYear(), 1, 14);
+  const year = new Date().getFullYear();
+  const valentine = new Date(year, 1, 14);
   const now = new Date();
   const diff = valentine - now;
   const days = Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
@@ -173,7 +204,6 @@ function updateCountdown() {
     days > 0 ? `${days} days until Valentine’s Day 💘` : `It’s Valentine’s Day 💖`;
 }
 updateCountdown();
-
 </script>
 
 </body>
